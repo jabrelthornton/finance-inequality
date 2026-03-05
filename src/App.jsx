@@ -607,6 +607,79 @@ function PersonalComparison({ wealthData }) {
   );
 }
 
+function AboutContact() {
+  return (
+    <section style={{ marginBottom: "clamp(60px,8vw,100px)" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 24 }}>
+
+        {/* About */}
+        <div style={{ border: `1px solid ${C.gold}33`, borderLeft: `3px solid ${C.gold}`, padding: "clamp(24px,4vw,40px)", background: C.surface }}>
+          <div style={{ ...monoStyle, fontSize: 11, color: C.gold, letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: 16 }}>
+            About
+          </div>
+          <div style={{ ...serifStyle, fontSize: 22, fontWeight: 700, color: "#f0ece0", marginBottom: 4 }}>
+            Jabre Thornton
+          </div>
+          <div style={{ ...monoStyle, fontSize: 11, color: C.textDim, marginBottom: 20, letterSpacing: "0.05em" }}>
+            Software Developer · Father
+          </div>
+          <p style={{ fontSize: 14, color: C.textMuted, lineHeight: 1.75 }}>
+            I built this site because the racial wealth and income gap is one of the most significant
+            and persistent injustices in American economic life — and I wanted to put real numbers
+            to it. Data has a way of cutting through the noise.
+          </p>
+          <p style={{ fontSize: 14, color: C.textMuted, lineHeight: 1.75, marginTop: 14 }}>
+            I'm a software developer and stay-at-home dad. This project is personal. The struggle
+            Black Americans have faced economically is not abstract to me, and I hope the data here
+            makes it less abstract for others too.
+          </p>
+        </div>
+
+        {/* Contact */}
+        <div style={{ border: `1px solid ${C.blue}33`, borderLeft: `3px solid ${C.blue}`, padding: "clamp(24px,4vw,40px)", background: C.surface }}>
+          <div style={{ ...monoStyle, fontSize: 11, color: C.blue, letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: 16 }}>
+            Contact
+          </div>
+          <div style={{ ...serifStyle, fontSize: 22, fontWeight: 700, color: "#f0ece0", marginBottom: 20 }}>
+            Questions or Feedback?
+          </div>
+          <p style={{ fontSize: 14, color: C.textMuted, lineHeight: 1.75, marginBottom: 28 }}>
+            If you have questions about the data, want to report an error, or just want to
+            reach out — I'd love to hear from you.
+          </p>
+          <a
+            href="mailto:jabrelthornton@gmail.com"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 10,
+              padding: "12px 22px",
+              background: `${C.blue}18`,
+              border: `1px solid ${C.blue}55`,
+              color: C.blue,
+              ...monoStyle,
+              fontSize: 13,
+              textDecoration: "none",
+              letterSpacing: "0.04em",
+              transition: "all 0.2s",
+            }}
+            onMouseEnter={e => { e.currentTarget.style.background = `${C.blue}30`; e.currentTarget.style.borderColor = C.blue; }}
+            onMouseLeave={e => { e.currentTarget.style.background = `${C.blue}18`; e.currentTarget.style.borderColor = `${C.blue}55`; }}
+          >
+            <svg width="15" height="12" viewBox="0 0 15 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="0.5" y="0.5" width="14" height="11" rx="1.5" stroke={C.blue}/>
+              <path d="M1 1L7.5 7L14 1" stroke={C.blue} strokeLinecap="round"/>
+            </svg>
+            jabrelthornton@gmail.com
+          </a>
+        </div>
+
+      </div>
+    </section>
+  );
+}
+
+
 // ============================================================
 //  LAYER 8 — ROOT APP
 //  Wires the data hook to the page layout.
@@ -682,6 +755,7 @@ export default function App() {
             <Divider/>
             <PersonalComparison    wealthData={wealthData}/>
             <WhyItPersists/>
+            <AboutContact/>
           </>
         )}
 
