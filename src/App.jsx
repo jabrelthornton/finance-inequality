@@ -3,6 +3,7 @@ import {
   LineChart, Line, BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer, ReferenceLine, Legend, Area, AreaChart
 } from "recharts";
+import { Analytics } from "@vercel/analytics/react";
 
 // ============================================================
 //  LAYER 1 — STATIC DATA STORE
@@ -692,6 +693,7 @@ export default function App() {
           <div style={{ marginTop:12, color: C.textGhost }}>Derenoncourt et al. (2022), "Wealth of Two Nations: The U.S. Racial Wealth Gap, 1860–2020"</div>
         </footer>
       </div>
+      <Analytics />
     </div>
   );
 }
