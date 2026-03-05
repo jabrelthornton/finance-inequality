@@ -3,6 +3,7 @@ import {
   LineChart, Line, BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer, ReferenceLine, Legend, Area, AreaChart
 } from "recharts";
+import { Analytics } from "@vercel/analytics/next"
 
 // ============================================================
 //  LAYER 1 — STATIC DATA STORE
@@ -625,7 +626,7 @@ export default function App() {
   const wm1989 = firstWealth.white && firstWealth.black ? (firstWealth.white / firstWealth.black).toFixed(1) : "—";
 
   return (
-    <div style={{ minHeight:"100vh", background: C.bg, color:"#d4cfc4", fontFamily:"'Georgia', serif" }}>
+    <div style={{ minHeight:"100vh", background: C.bg, color:"#d4cfc4", fontFamily:"'Georgia', serif", display: "flex", flexDirection: "column", alignItems: "center" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Mono:wght@300;400;500&display=swap');
         *{box-sizing:border-box;margin:0;padding:0;}

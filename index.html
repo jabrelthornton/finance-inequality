@@ -1,13 +1,110 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>finance-inequality</title>
+
+    <!-- ── Primary Meta Tags ────────────────────────────── -->
+    <title>The Persistent Gap — Black & White Wealth and Income Inequality in America</title>
+    <meta name="title"       content="The Persistent Gap — Black & White Wealth and Income Inequality in America" />
+    <meta name="description" content="Six decades after the Civil Rights Act, Black Americans earn 65 cents for every dollar earned by white Americans and hold a fraction of white family wealth. Explore the data from 1967 to today." />
+    <meta name="keywords"    content="racial wealth gap, income inequality, Black wealth, racial economic inequality, racial income gap, wealth disparity, Federal Reserve SCF, Census income data" />
+    <meta name="author"      content="The Persistent Gap" />
+    <meta name="robots"      content="index, follow" />
+    <link rel="canonical"    href="https://thepersistentgap.com/" />
+
+    <!-- ── Open Graph / Facebook ────────────────────────── -->
+    <meta property="og:type"        content="website" />
+    <meta property="og:url"         content="https://thepersistentgap.com/" />
+    <meta property="og:title"       content="The Persistent Gap — Black & White Wealth and Income Inequality in America" />
+    <meta property="og:description" content="Six decades after the Civil Rights Act, Black Americans earn 65 cents for every dollar earned by white Americans. See the data from 1967 to today." />
+    <meta property="og:image"       content="https://thepersistentgap.com/og-image.png" />
+    <meta property="og:image:width"  content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:site_name"   content="The Persistent Gap" />
+    <meta property="og:locale"      content="en_US" />
+
+    <!-- ── Twitter Card ─────────────────────────────────── -->
+    <meta name="twitter:card"        content="summary_large_image" />
+    <meta name="twitter:url"         content="https://thepersistentgap.com/" />
+    <meta name="twitter:title"       content="The Persistent Gap — Black & White Wealth and Income Inequality in America" />
+    <meta name="twitter:description" content="Six decades after the Civil Rights Act, Black Americans earn 65 cents for every dollar earned by white Americans. See the data from 1967 to today." />
+    <meta name="twitter:image"       content="https://thepersistentgap.com/og-image.png" />
+
+    <!-- ── Structured Data (JSON-LD) ────────────────────── -->
+    <!--
+      Tells Google this is a data-driven article/dataset.
+      Helps it appear in rich results and knowledge panels.
+    -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Dataset",
+      "name": "The Persistent Gap — U.S. Racial Wealth and Income Inequality",
+      "description": "Historical data on the Black-white income gap (1967–2022) and wealth gap (1989–2022) in the United States, sourced from the U.S. Census Bureau and the Federal Reserve Survey of Consumer Finances.",
+      "url": "https://thepersistentgap.com/",
+      "keywords": ["racial wealth gap", "income inequality", "racial economic inequality", "Black wealth"],
+      "creator": {
+        "@type": "Organization",
+        "name": "The Persistent Gap"
+      },
+      "citation": [
+        {
+          "@type": "CreativeWork",
+          "name": "Historical Income Tables: Households, Table H-5",
+          "publisher": { "@type": "Organization", "name": "U.S. Census Bureau" },
+          "url": "https://www.census.gov/data/tables/time-series/demo/income-poverty/historical-income-households.html"
+        },
+        {
+          "@type": "CreativeWork",
+          "name": "Survey of Consumer Finances",
+          "publisher": { "@type": "Organization", "name": "Federal Reserve Board" },
+          "url": "https://www.federalreserve.gov/econres/scfindex.htm"
+        }
+      ],
+      "temporalCoverage": "1967/2022",
+      "spatialCoverage": {
+        "@type": "Place",
+        "name": "United States"
+      }
+    }
+    </script>
+
+    <!-- ── Favicon ───────────────────────────────────────── -->
+    <!-- Replace with your actual favicon files -->
+    <link rel="icon"             type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" sizes="180x180"      href="/apple-touch-icon.png" />
+
+    <!-- ── Preconnect for performance ───────────────────── -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   </head>
+
   <body>
     <div id="root"></div>
+
+    <!--
+      IMPORTANT: The noscript tag below improves SEO for users/crawlers
+      without JavaScript. Keep the key facts here as plain text —
+      Google can read this even if it can't render the React app.
+    -->
+    <noscript>
+      <main>
+        <h1>The Persistent Gap — Racial Wealth and Income Inequality in America</h1>
+        <p>
+          Six decades after the Civil Rights Act, Black Americans continue to face
+          significant economic inequality. In 2022, the median Black household earned
+          approximately 65 cents for every dollar earned by the median white household.
+          The median Black family holds roughly $44,900 in net worth, compared to
+          $285,000 for the median white family — a gap of over $240,000.
+        </p>
+        <p>
+          Data sourced from the U.S. Census Bureau Historical Income Tables (1967–2022)
+          and the Federal Reserve Survey of Consumer Finances (1989–2022).
+        </p>
+      </main>
+    </noscript>
+
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
