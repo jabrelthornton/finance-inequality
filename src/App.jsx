@@ -3,7 +3,6 @@ import {
   LineChart, Line, BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer, ReferenceLine, Legend, Area, AreaChart
 } from "recharts";
-import { Analytics } from "@vercel/analytics/next"
 
 // ============================================================
 //  LAYER 1 — STATIC DATA STORE
