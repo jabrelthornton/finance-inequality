@@ -3,15 +3,13 @@ import {
   LineChart, Line, BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer, ReferenceLine, Legend, Area, AreaChart
 } from "recharts";
+import { CONTENT as C_TEXT } from "./content.js";
 
 // ============================================================
 //  LAYER 1 — STATIC DATA STORE
-//  These are the raw values used when live APIs are not wired in.
-//  To update a dataset, edit only this section.
 // ============================================================
 
 const STATIC_DATA = {
-  // Source: U.S. Census Bureau, Historical Income Table H-5 (2022 CPI-U-RS adjusted)
   income: [
     { year: 1967, black: 29340,  white: 49990  },
     { year: 1970, black: 32557,  white: 55185  },
@@ -28,7 +26,6 @@ const STATIC_DATA = {
     { year: 2021, black: 48297,  white: 77999  },
     { year: 2022, black: 52860,  white: 81060  },
   ],
-  // Source: Federal Reserve Survey of Consumer Finances (2022 dollars)
   wealth: [
     { year: 1989, black: 12000,  white: 130000 },
     { year: 1992, black: 13000,  white: 130000 },
@@ -47,46 +44,18 @@ const STATIC_DATA = {
 
 // ============================================================
 //  LAYER 2 — DATA SERVICE
-//  Each function is the single place to change when switching
-//  a dataset from static to a live API.
-//
-//  Every function returns: Promise<{ year, black, white }[]>
-//
-//  To go live, replace the function body with a fetch() call.
-//  The rest of the app is completely untouched.
-//
-//  Example swap-in for income data via FRED API:
-//
-//    async function fetchIncomeData() {
-//      const FRED_KEY = "YOUR_API_KEY";
-//      const [bRes, wRes] = await Promise.all([
-//        fetch(`https://api.stlouisfed.org/fred/series/observations
-//               ?series_id=MEHOINUSBIA672N&api_key=${FRED_KEY}&file_type=json`),
-//        fetch(`https://api.stlouisfed.org/fred/series/observations
-//               ?series_id=MEHOINUSWHA672N&api_key=${FRED_KEY}&file_type=json`),
-//      ]);
-//      const [bJson, wJson] = await Promise.all([bRes.json(), wRes.json()]);
-//      // merge by year into { year, black, white } rows and return
-//    }
 // ============================================================
 
 async function fetchIncomeData() {
-  // ← replace this body with a fetch() call to go live
   return STATIC_DATA.income;
 }
 
 async function fetchWealthData() {
-  // ← replace this body with a fetch() call to go live
-  // Note: SCF is published every 3 years with no public REST API.
-  // Update STATIC_DATA.wealth after each new SCF release (~2025).
   return STATIC_DATA.wealth;
 }
 
 // ============================================================
 //  LAYER 3 — DATA NORMALISATION
-//  Computes derived fields (gap, ratio) from whatever shape the
-//  data source returns. Centralised here so API responses and
-//  static data both flow through the same transform.
 // ============================================================
 
 const normalise = (d) => ({
@@ -97,8 +66,6 @@ const normalise = (d) => ({
 
 // ============================================================
 //  LAYER 4 — DATA HOOK
-//  Manages loading / error state for all datasets.
-//  Components consume this; they never touch the service layer.
 // ============================================================
 
 function useInequalityData() {
@@ -146,7 +113,7 @@ const C = {
 
 const fmt  = (n) => "$" + (n || 0).toLocaleString();
 const fmtK = (n) => n >= 1000 ? "$" + (n / 1000).toFixed(0) + "k" : "$" + n;
-const monoStyle = { fontFamily: "'DM Mono', monospace" };
+const monoStyle  = { fontFamily: "'DM Mono', monospace" };
 const serifStyle = { fontFamily: "'Playfair Display', Georgia, serif" };
 const xTick = { ...monoStyle, fontSize: 11, fill: C.textDim };
 const yTick = { ...monoStyle, fontSize: 11, fill: C.textDim };
@@ -161,8 +128,8 @@ const IncomeTooltip = ({ active, payload, label }) => {
   return (
     <div style={{ background: C.surface, border: `1px solid ${C.gold}`, padding: "14px 18px", ...monoStyle, fontSize: 13 }}>
       <div style={{ color: C.gold, fontWeight: 700, marginBottom: 8, fontSize: 15 }}>{label}</div>
-      <div style={{ color: C.amber, marginBottom: 3 }}>White households: <strong>{fmt(d?.white)}</strong></div>
-      <div style={{ color: C.rust,  marginBottom: 3 }}>Black households: <strong>{fmt(d?.black)}</strong></div>
+      <div style={{ color: C.amber, marginBottom: 3 }}>{C_TEXT.income.legendLabels.white}: <strong>{fmt(d?.white)}</strong></div>
+      <div style={{ color: C.rust,  marginBottom: 3 }}>{C_TEXT.income.legendLabels.black}: <strong>{fmt(d?.black)}</strong></div>
       <div style={{ color: C.textMuted, marginTop: 8, borderTop: "1px solid #333", paddingTop: 8 }}>
         Gap: <strong style={{ color: "#fff" }}>{fmt(d?.gap)}</strong><br />
         Black income = <strong style={{ color: "#fff" }}>{d?.ratio}¢</strong> per white $1
@@ -177,8 +144,8 @@ const WealthTooltip = ({ active, payload, label }) => {
   return (
     <div style={{ background: C.surface, border: `1px solid ${C.gold}`, padding: "14px 18px", ...monoStyle, fontSize: 13 }}>
       <div style={{ color: C.gold, fontWeight: 700, marginBottom: 8, fontSize: 15 }}>{label}</div>
-      <div style={{ color: C.amber, marginBottom: 3 }}>White families: <strong>{fmt(d?.white)}</strong></div>
-      <div style={{ color: C.rust,  marginBottom: 3 }}>Black families: <strong>{fmt(d?.black)}</strong></div>
+      <div style={{ color: C.amber, marginBottom: 3 }}>{C_TEXT.wealthBar.legendLabels.white}: <strong>{fmt(d?.white)}</strong></div>
+      <div style={{ color: C.rust,  marginBottom: 3 }}>{C_TEXT.wealthBar.legendLabels.black}: <strong>{fmt(d?.black)}</strong></div>
       <div style={{ color: C.textMuted, marginTop: 8, borderTop: "1px solid #333", paddingTop: 8 }}>
         Gap: <strong style={{ color: "#fff" }}>{fmt(d?.gap)}</strong><br />
         Black wealth = <strong style={{ color: "#fff" }}>{d?.ratio}¢</strong> per white $1
@@ -232,21 +199,25 @@ const DataNote = ({ children }) => (
 
 // ============================================================
 //  LAYER 7 — SECTION COMPONENTS
-//  Each receives only the data slice it needs as props.
-//  Adding a new dataset = new fetch fn + new section component.
 // ============================================================
 
 function IncomeSection({ data }) {
   const [view, setView] = useState("gap");
+  const tx = C_TEXT.income;
+
   return (
     <section style={{ marginBottom: "clamp(60px,8vw,100px)" }}>
-      <SectionHeader num={1} sub="U.S. Census Bureau, Table H-5" title="Median Household Income Has Stalled for Decades" />
+      <SectionHeader num={1} sub={tx.sectionTag} title={tx.title} />
       <p style={{ color: C.textMuted, lineHeight: 1.7, maxWidth: 680, marginBottom: 32, fontSize: 15 }}>
-        Adjusted for inflation, the income gap between Black and white households has remained stubbornly wide since 1967.
-        Despite periods of progress, Black households earn roughly <strong style={{ color: "#d4cfc4" }}>65 cents</strong> for
-        every dollar earned by white households — nearly unchanged from 55 years ago.
+        {tx.body.split(tx.bodyAccentPhrase).map((part, i) =>
+          i === 0
+            ? <span key={i}>{part}<strong style={{ color: "#d4cfc4" }}>{tx.bodyAccentPhrase}</strong></span>
+            : <span key={i}>{part}</span>
+        )}
       </p>
-      <TabBar options={[["gap","Dollar Gap"],["ratio","Earnings Ratio"],["both","Both Lines"]]} active={view} onChange={setView} />
+
+      <TabBar options={tx.tabs} active={view} onChange={setView} />
+
       <div style={{ height: 360 }}>
         {view === "gap" && (
           <ResponsiveContainer width="100%" height="100%">
@@ -261,7 +232,7 @@ function IncomeSection({ data }) {
               <XAxis dataKey="year" tick={xTick} axisLine={{ stroke: C.border }} tickLine={false}/>
               <YAxis tickFormatter={fmtK} tick={yTick} axisLine={false} tickLine={false}/>
               <Tooltip content={<IncomeTooltip/>}/>
-              <Area type="monotone" dataKey="gap" stroke={C.gold} strokeWidth={2} fill="url(#gapGrad)" name="Income Gap"/>
+              <Area type="monotone" dataKey="gap" stroke={C.gold} strokeWidth={2} fill="url(#gapGrad)" name={tx.tabs[0][1]}/>
             </AreaChart>
           </ResponsiveContainer>
         )}
@@ -276,11 +247,12 @@ function IncomeSection({ data }) {
                 return (
                   <div style={{ background: C.surface, border:`1px solid ${C.gold}`, padding:"12px 16px", ...monoStyle, fontSize:13 }}>
                     <div style={{ color: C.gold, fontWeight:700, marginBottom:6 }}>{label}</div>
-                    <div style={{ color:"#fff" }}>Black earns <strong>{payload[0].value}¢</strong> per white $1</div>
+                    <div style={{ color:"#fff" }}>{tx.ratioTooltipLabel(payload[0].value)}</div>
                   </div>
                 );
               }}/>
-              <ReferenceLine y={100} stroke="#334455" strokeDasharray="6 3" label={{ value:"Equal pay", fill:"#334455", ...monoStyle, fontSize:11 }}/>
+              <ReferenceLine y={100} stroke="#334455" strokeDasharray="6 3"
+                label={{ value: tx.referenceLineLabel, fill:"#334455", ...monoStyle, fontSize:11 }}/>
               <Line type="monotone" dataKey="ratio" stroke={C.gold} strokeWidth={2.5} dot={{ r:4, fill:C.gold, strokeWidth:0 }}/>
             </LineChart>
           </ResponsiveContainer>
@@ -293,18 +265,19 @@ function IncomeSection({ data }) {
               <YAxis tickFormatter={fmtK} tick={yTick} axisLine={false} tickLine={false}/>
               <Tooltip content={<IncomeTooltip/>}/>
               <Legend wrapperStyle={{ ...monoStyle, fontSize:12, color:C.textMuted, paddingTop:12 }}/>
-              <Line type="monotone" dataKey="white" stroke={C.amber} strokeWidth={2.5} dot={false} name="White households"/>
-              <Line type="monotone" dataKey="black" stroke={C.rust}  strokeWidth={2.5} dot={false} name="Black households"/>
+              <Line type="monotone" dataKey="white" stroke={C.amber} strokeWidth={2.5} dot={false} name={tx.legendLabels.white}/>
+              <Line type="monotone" dataKey="black" stroke={C.rust}  strokeWidth={2.5} dot={false} name={tx.legendLabels.black}/>
             </LineChart>
           </ResponsiveContainer>
         )}
       </div>
-      <DataNote>Source: U.S. Census Bureau, Historical Income Tables: Households, Table H-5 — Adjusted to 2022 dollars (CPI-U-RS)</DataNote>
+      <DataNote>{tx.dataNote}</DataNote>
     </section>
   );
 }
 
 function WealthBarSection({ data }) {
+  const tx    = C_TEXT.wealthBar;
   const last  = data[data.length-1] || {};
   const first = data[0] || {};
   const m2022 = last.white  && last.black  ? (last.white  / last.black ).toFixed(1) : "—";
@@ -312,15 +285,18 @@ function WealthBarSection({ data }) {
 
   return (
     <section style={{ marginBottom: "clamp(60px,8vw,100px)" }}>
-      <SectionHeader num={2} sub="Federal Reserve Survey of Consumer Finances" title="The Wealth Gap Is Even Starker — and Growing"/>
-      <p style={{ color: C.textMuted, lineHeight: 1.7, maxWidth: 680, marginBottom: 32, fontSize: 15 }}>
-        Wealth — not income — determines financial security across generations. In 2022, the median white family held{" "}
-        <strong style={{ color:"#d4cfc4" }}>{fmt(last.white)}</strong> in wealth. The median Black family held{" "}
-        <strong style={{ color: C.rust }}>{fmt(last.black)}</strong> — just{" "}
-        <strong style={{ color: C.rust }}>{last.ratio}¢</strong> per white dollar.
-        The white-to-Black multiplier in 2022 is <strong style={{ color:"#d4cfc4" }}>{m2022}×</strong>,
-        barely improved from <strong style={{ color:"#d4cfc4" }}>{m1989}×</strong> in 1989.
-      </p>
+      <SectionHeader num={2} sub={tx.sectionTag} title={tx.title}/>
+      <p style={{ color: C.textMuted, lineHeight: 1.7, maxWidth: 680, marginBottom: 32, fontSize: 15 }}
+        dangerouslySetInnerHTML={{ __html:
+          tx.body(
+            `<strong style="color:#d4cfc4">${fmt(last.white)}</strong>`,
+            `<strong style="color:${C.rust}">${fmt(last.black)}</strong>`,
+            `<strong style="color:${C.rust}">${last.ratio}</strong>`,
+            `<strong style="color:#d4cfc4">${m2022}</strong>`,
+            `<strong style="color:#d4cfc4">${m1989}</strong>`,
+          )
+        }}
+      />
       <div style={{ height: 380 }}>
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data} margin={{ top:10, right:20, left:10, bottom:5 }} barCategoryGap="30%">
@@ -329,23 +305,23 @@ function WealthBarSection({ data }) {
             <YAxis tickFormatter={fmtK} tick={yTick} axisLine={false} tickLine={false}/>
             <Tooltip content={<WealthTooltip/>}/>
             <Legend wrapperStyle={{ ...monoStyle, fontSize:12, color:C.textMuted, paddingTop:12 }}/>
-            <Bar dataKey="white" fill={C.amber} fillOpacity={0.85} radius={[2,2,0,0]} name="White families"/>
-            <Bar dataKey="black" fill={C.rust}  fillOpacity={0.9}  radius={[2,2,0,0]} name="Black families"/>
+            <Bar dataKey="white" fill={C.amber} fillOpacity={0.85} radius={[2,2,0,0]} name={tx.legendLabels.white}/>
+            <Bar dataKey="black" fill={C.rust}  fillOpacity={0.9}  radius={[2,2,0,0]} name={tx.legendLabels.black}/>
           </BarChart>
         </ResponsiveContainer>
       </div>
-      <DataNote>Source: Federal Reserve Board, Survey of Consumer Finances (SCF) — Median family net worth, 2022 dollars</DataNote>
+      <DataNote>{tx.dataNote}</DataNote>
     </section>
   );
 }
 
 function WealthRatioSection({ data }) {
+  const tx = C_TEXT.wealthRatio;
   return (
     <section style={{ marginBottom: "clamp(60px,8vw,100px)" }}>
-      <SectionHeader num={3} sub="Derived from Federal Reserve SCF" title="The Ratio Has Barely Moved"/>
+      <SectionHeader num={3} sub={tx.sectionTag} title={tx.title}/>
       <p style={{ color: C.textMuted, lineHeight: 1.7, maxWidth: 680, marginBottom: 32, fontSize: 15 }}>
-        Even as absolute wealth has grown for both groups, Black families' share of white wealth has changed little.
-        The 2008 financial crisis — which hit Black homeowners hardest — erased gains made in the early 2000s.
+        {tx.body}
       </p>
       <div style={{ height: 320 }}>
         <ResponsiveContainer width="100%" height="100%">
@@ -364,7 +340,7 @@ function WealthRatioSection({ data }) {
               return (
                 <div style={{ background: C.surface, border:`1px solid ${C.blue}`, padding:"12px 16px", ...monoStyle, fontSize:13 }}>
                   <div style={{ color: C.blue, fontWeight:700, marginBottom:6 }}>{label}</div>
-                  <div style={{ color:"#fff" }}>Black wealth = <strong>{payload[0].value}¢</strong> per white $1</div>
+                  <div style={{ color:"#fff" }}>{tx.tooltipLabel(payload[0].value)}</div>
                 </div>
               );
             }}/>
@@ -373,22 +349,20 @@ function WealthRatioSection({ data }) {
           </AreaChart>
         </ResponsiveContainer>
       </div>
-      <DataNote>Black wealth as cents per dollar of white wealth — 100¢ would represent full equality</DataNote>
+      <DataNote>{tx.dataNote}</DataNote>
     </section>
   );
 }
 
 function WhyItPersists() {
-  const items = [
-    ["Historical exclusion",     "Redlining, GI Bill exclusions, and wealth-stripping policies in the 20th century blocked Black families from building intergenerational wealth."],
-    ["Compounding disadvantage", "Wealth grows on itself. Families with more assets accumulate more through investment returns, inheritance, and home equity."],
-    ["Income ceiling",           "Even with better income today, earning less for decades means less saved, invested, and passed down — the gap compounds over generations."],
-  ];
+  const tx = C_TEXT.whyItPersists;
   return (
     <section style={{ border:`1px solid ${C.gold}33`, borderLeft:`4px solid ${C.gold}`, padding:"clamp(24px,4vw,48px)", background: C.surface, marginBottom:"clamp(60px,8vw,100px)" }}>
-      <div style={{ ...monoStyle, fontSize:11, color: C.gold, letterSpacing:"0.2em", textTransform:"uppercase", marginBottom:16 }}>Why the gap persists</div>
+      <div style={{ ...monoStyle, fontSize:11, color: C.gold, letterSpacing:"0.2em", textTransform:"uppercase", marginBottom:16 }}>
+        {tx.eyebrow}
+      </div>
       <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(260px,1fr))", gap:24 }}>
-        {items.map(([title, body]) => (
+        {tx.items.map(({ title, body }) => (
           <div key={title}>
             <div style={{ ...serifStyle, fontSize:17, fontWeight:700, color:"#d4cfc4", marginBottom:8 }}>{title}</div>
             <div style={{ fontSize:14, color: C.textMuted, lineHeight:1.65 }}>{body}</div>
@@ -400,70 +374,55 @@ function WhyItPersists() {
 }
 
 function PersonalComparison({ wealthData }) {
-  const [raw, setRaw]         = useState("");
+  const [raw, setRaw]          = useState("");
   const [submitted, setSubmit] = useState(false);
-  const [error, setError]     = useState(null);
+  const [error, setError]      = useState(null);
 
+  const tx     = C_TEXT.personalComparison;
   const latest = wealthData[wealthData.length - 1] || { black: 44900, white: 285000, year: 2022 };
 
-  // Parse and validate the raw input
   const validate = (value) => {
     const trimmed = value.trim();
-    if (trimmed === "") return { ok: false, msg: "Please enter a net worth value." };
-    if (/[a-zA-Z]/.test(trimmed)) return { ok: false, msg: "Net worth must be a number — no letters allowed." };
+    if (trimmed === "")            return { ok: false, msg: tx.validation.empty };
+    if (/[a-zA-Z]/.test(trimmed)) return { ok: false, msg: tx.validation.hasLetters };
     const n = parseFloat(trimmed.replace(/[^0-9.-]/g, ""));
-    if (isNaN(n)) return { ok: false, msg: "That doesn't look like a valid number. Try something like 50000 or $50,000." };
-    if (n < 0) return { ok: false, msg: "Negative net worth is valid in real life, but this calculator only supports values of $0 or more." };
-    if (n > 5_000_000_000_000) return { ok: false, msg: "Please enter a value under $5 trillion." };
+    if (isNaN(n))  return { ok: false, msg: tx.validation.invalid };
+    if (n < 0)     return { ok: false, msg: tx.validation.negative };
+    if (n > 5e12)  return { ok: false, msg: tx.validation.tooLarge };
     return { ok: true, value: n };
   };
 
-  const parsed   = validate(raw);
-  const userVal  = parsed.ok ? parsed.value : 0;
+  const parsed  = validate(raw);
+  const userVal = parsed.ok ? parsed.value : 0;
 
   const pctOfWhite = latest.white ? +((userVal / latest.white) * 100).toFixed(1) : 0;
   const pctOfBlack = latest.black ? +((userVal / latest.black) * 100).toFixed(1) : 0;
   const aboveWhite = userVal >= latest.white;
   const aboveBlack = userVal >= latest.black;
 
-  // bar chart data — cap display at a reasonable ceiling for readability
   const ceiling   = Math.max(userVal, latest.white) * 1.15;
   const chartData = [
-    { label: "You",          value: userVal,       fill: "#a0c4ff" },
-    { label: "Median Black", value: latest.black,  fill: C.rust   },
-    { label: "Median White", value: latest.white,  fill: C.amber  },
+    { label: tx.chartLabels.you,         value: userVal,      fill: "#a0c4ff" },
+    { label: tx.chartLabels.medianBlack, value: latest.black, fill: C.rust   },
+    { label: tx.chartLabels.medianWhite, value: latest.white, fill: C.amber  },
   ];
 
-  const handleInput = (e) => {
-    setRaw(e.target.value);
-    setSubmit(false);
-    setError(null);
-  };
-
+  const handleInput = (e) => { setRaw(e.target.value); setSubmit(false); setError(null); };
   const handleSubmit = () => {
     const result = validate(raw);
-    if (!result.ok) {
-      setError(result.msg);
-      setSubmit(false);
-    } else {
-      setError(null);
-      setSubmit(true);
-    }
+    if (!result.ok) { setError(result.msg); setSubmit(false); }
+    else            { setError(null);        setSubmit(true);  }
   };
 
-  // contextual message
   const getMessage = () => {
     if (userVal === 0) return null;
-    if (aboveWhite)
-      return { color: C.amber, text: `Your net worth exceeds the median white family's wealth of ${fmt(latest.white)}. You are in a position of significant financial advantage relative to both medians.` };
-    if (aboveBlack)
-      return { color: "#a0c4ff", text: `Your net worth is above the median Black family (${fmt(latest.black)}) but below the median white family (${fmt(latest.white)}). The gap between those two medians is ${fmt(latest.white - latest.black)}.` };
-    return { color: C.rust, text: `Your net worth is below both medians. The median Black family holds ${fmt(latest.black)} and the median white family holds ${fmt(latest.white)} — a gap of ${fmt(latest.white - latest.black)}.` };
+    if (aboveWhite) return { color: C.amber,    text: tx.contextMessages.aboveWhite(fmt(latest.white)) };
+    if (aboveBlack) return { color: "#a0c4ff",  text: tx.contextMessages.aboveBlack(fmt(latest.black), fmt(latest.white), fmt(latest.white - latest.black)) };
+    return           { color: C.rust,           text: tx.contextMessages.belowBoth(fmt(latest.black), fmt(latest.white), fmt(latest.white - latest.black)) };
   };
 
   const msg = submitted ? getMessage() : null;
 
-  // Custom bar label
   const CustomBarLabel = ({ x, y, width, value, fill }) => {
     if (!value) return null;
     return (
@@ -476,63 +435,44 @@ function PersonalComparison({ wealthData }) {
 
   return (
     <section style={{ marginBottom: "clamp(60px,8vw,100px)" }}>
-      <SectionHeader num={4} sub="Personal Calculator" title="Where Do You Stand?" />
+      <SectionHeader num={4} sub={tx.sectionTag} title={tx.title} />
       <p style={{ color: C.textMuted, lineHeight: 1.7, maxWidth: 680, marginBottom: 36, fontSize: 15 }}>
-        Enter your estimated net worth — assets minus debts — to see how you compare to the
-        median Black and white family in {latest.year}.
+        {tx.body(latest.year)}
       </p>
 
-      {/* Input row */}
+      {/* Input */}
       <div style={{ marginBottom: 36 }}>
         <div style={{ display: "flex", gap: 12, alignItems: "stretch", flexWrap: "wrap" }}>
           <div style={{ position: "relative", flex: "1 1 280px", maxWidth: 380 }}>
-            <span style={{
-              position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)",
-              ...monoStyle, fontSize: 15, color: C.textDim, pointerEvents: "none",
-            }}>$</span>
+            <span style={{ position:"absolute", left:14, top:"50%", transform:"translateY(-50%)", ...monoStyle, fontSize:15, color:C.textDim, pointerEvents:"none" }}>$</span>
             <input
               type="text"
-              placeholder="0"
+              placeholder={tx.inputPlaceholder}
               value={raw.replace(/^\$/, "")}
               onChange={handleInput}
               onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
               style={{
-                width: "100%",
-                padding: "14px 14px 14px 28px",
+                width:"100%", padding:"14px 14px 14px 28px",
                 background: C.surface2,
                 border: `1px solid ${error ? C.rust : submitted ? C.gold : C.border}`,
-                color: "#f0ece0",
-                ...monoStyle, fontSize: 18,
-                outline: "none",
-                transition: "border-color 0.2s",
+                color:"#f0ece0", ...monoStyle, fontSize:18,
+                outline:"none", transition:"border-color 0.2s",
               }}
             />
           </div>
-          <button
-            onClick={handleSubmit}
-            style={{
-              padding: "14px 28px",
-              background: C.gold,
-              color: "#0b0d14",
-              border: "none",
-              ...monoStyle, fontSize: 13, fontWeight: 600,
-              letterSpacing: "0.08em", textTransform: "uppercase",
-              cursor: "pointer",
-            }}
-          >
-            Compare
+          <button onClick={handleSubmit} style={{
+            padding:"14px 28px", background:C.gold, color:"#0b0d14", border:"none",
+            ...monoStyle, fontSize:13, fontWeight:600, letterSpacing:"0.08em",
+            textTransform:"uppercase", cursor:"pointer",
+          }}>
+            {tx.compareButton}
           </button>
         </div>
         {error && (
-          <div style={{
-            display: "flex", alignItems: "flex-start", gap: 8,
-            marginTop: 10, padding: "10px 14px",
-            background: `${C.rust}11`,
-            border: `1px solid ${C.rust}44`,
-            borderLeft: `3px solid ${C.rust}`,
-          }}>
-            <span style={{ color: C.rust, fontSize: 14, lineHeight: 1, marginTop: 1 }}>⚠</span>
-            <span style={{ ...monoStyle, fontSize: 12, color: C.rust, lineHeight: 1.5 }}>{error}</span>
+          <div style={{ display:"flex", alignItems:"flex-start", gap:8, marginTop:10, padding:"10px 14px",
+            background:`${C.rust}11`, border:`1px solid ${C.rust}44`, borderLeft:`3px solid ${C.rust}` }}>
+            <span style={{ color:C.rust, fontSize:14, lineHeight:1, marginTop:1 }}>⚠</span>
+            <span style={{ ...monoStyle, fontSize:12, color:C.rust, lineHeight:1.5 }}>{error}</span>
           </div>
         )}
       </div>
@@ -540,67 +480,62 @@ function PersonalComparison({ wealthData }) {
       {/* Results */}
       {submitted && userVal >= 0 && (
         <>
-          {/* Stat pills */}
-          <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 36 }}>
-            <div style={{ border: `1px solid #a0c4ff33`, borderLeft: `3px solid #a0c4ff`, padding: "16px 22px", background: C.surface2, flex: 1, minWidth: 160 }}>
-              <div style={{ ...serifStyle, fontSize: 28, fontWeight: 700, color: "#a0c4ff", lineHeight: 1 }}>
+          <div style={{ display:"flex", gap:12, flexWrap:"wrap", marginBottom:36 }}>
+            <div style={{ border:`1px solid #a0c4ff33`, borderLeft:`3px solid #a0c4ff`, padding:"16px 22px", background:C.surface2, flex:1, minWidth:160 }}>
+              <div style={{ ...serifStyle, fontSize:28, fontWeight:700, color:"#a0c4ff", lineHeight:1 }}>
                 {pctOfBlack > 999 ? (pctOfBlack / 100).toFixed(1) + "×" : pctOfBlack + "%"}
               </div>
-              <div style={{ ...monoStyle, fontSize: 11, color: C.textMuted, marginTop: 6, textTransform: "uppercase", letterSpacing: "0.08em" }}>
-                {pctOfBlack > 100 ? "above" : "of"} median Black wealth
+              <div style={{ ...monoStyle, fontSize:11, color:C.textMuted, marginTop:6, textTransform:"uppercase", letterSpacing:"0.08em" }}>
+                {tx.statLabels.black(pctOfBlack > 100)}
               </div>
             </div>
-            <div style={{ border: `1px solid ${C.gold}33`, borderLeft: `3px solid ${C.gold}`, padding: "16px 22px", background: C.surface2, flex: 1, minWidth: 160 }}>
-              <div style={{ ...serifStyle, fontSize: 28, fontWeight: 700, color: C.gold, lineHeight: 1 }}>
+            <div style={{ border:`1px solid ${C.gold}33`, borderLeft:`3px solid ${C.gold}`, padding:"16px 22px", background:C.surface2, flex:1, minWidth:160 }}>
+              <div style={{ ...serifStyle, fontSize:28, fontWeight:700, color:C.gold, lineHeight:1 }}>
                 {pctOfWhite > 999 ? (pctOfWhite / 100).toFixed(1) + "×" : pctOfWhite + "%"}
               </div>
-              <div style={{ ...monoStyle, fontSize: 11, color: C.textMuted, marginTop: 6, textTransform: "uppercase", letterSpacing: "0.08em" }}>
-                {pctOfWhite > 100 ? "above" : "of"} median white wealth
+              <div style={{ ...monoStyle, fontSize:11, color:C.textMuted, marginTop:6, textTransform:"uppercase", letterSpacing:"0.08em" }}>
+                {tx.statLabels.white(pctOfWhite > 100)}
               </div>
             </div>
-            <div style={{ border: `1px solid ${C.rust}33`, borderLeft: `3px solid ${C.rust}`, padding: "16px 22px", background: C.surface2, flex: 1, minWidth: 160 }}>
-              <div style={{ ...serifStyle, fontSize: 28, fontWeight: 700, color: C.rust, lineHeight: 1 }}>
+            <div style={{ border:`1px solid ${C.rust}33`, borderLeft:`3px solid ${C.rust}`, padding:"16px 22px", background:C.surface2, flex:1, minWidth:160 }}>
+              <div style={{ ...serifStyle, fontSize:28, fontWeight:700, color:C.rust, lineHeight:1 }}>
                 {fmt(latest.white - latest.black)}
               </div>
-              <div style={{ ...monoStyle, fontSize: 11, color: C.textMuted, marginTop: 6, textTransform: "uppercase", letterSpacing: "0.08em" }}>racial wealth gap ({latest.year})</div>
+              <div style={{ ...monoStyle, fontSize:11, color:C.textMuted, marginTop:6, textTransform:"uppercase", letterSpacing:"0.08em" }}>
+                {tx.statLabels.gapLabel(latest.year)}
+              </div>
             </div>
           </div>
 
-          {/* Bar chart */}
-          <div style={{ height: 300, marginBottom: 24 }}>
+          <div style={{ height:300, marginBottom:24 }}>
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={chartData} margin={{ top: 30, right: 20, left: 10, bottom: 5 }} barCategoryGap="35%">
-                <CartesianGrid strokeDasharray="3 3" stroke={C.grid} vertical={false} />
-                <XAxis dataKey="label" tick={{ ...monoStyle, fontSize: 12, fill: C.textDim }} axisLine={{ stroke: C.border }} tickLine={false} />
-                <YAxis tickFormatter={fmtK} tick={yTick} axisLine={false} tickLine={false} domain={[0, ceiling]} />
+              <BarChart data={chartData} margin={{ top:30, right:20, left:10, bottom:5 }} barCategoryGap="35%">
+                <CartesianGrid strokeDasharray="3 3" stroke={C.grid} vertical={false}/>
+                <XAxis dataKey="label" tick={{ ...monoStyle, fontSize:12, fill:C.textDim }} axisLine={{ stroke:C.border }} tickLine={false}/>
+                <YAxis tickFormatter={fmtK} tick={yTick} axisLine={false} tickLine={false} domain={[0, ceiling]}/>
                 <Tooltip content={({ active, payload, label }) => {
-                  if (!active || !payload?.length) return null;
+                  if (!active||!payload?.length) return null;
                   return (
-                    <div style={{ background: C.surface, border: `1px solid ${payload[0]?.payload?.fill}`, padding: "12px 16px", ...monoStyle, fontSize: 13 }}>
-                      <div style={{ color: payload[0]?.payload?.fill, fontWeight: 700, marginBottom: 4 }}>{label}</div>
-                      <div style={{ color: "#fff" }}>{fmt(payload[0].value)}</div>
+                    <div style={{ background:C.surface, border:`1px solid ${payload[0]?.payload?.fill}`, padding:"12px 16px", ...monoStyle, fontSize:13 }}>
+                      <div style={{ color:payload[0]?.payload?.fill, fontWeight:700, marginBottom:4 }}>{label}</div>
+                      <div style={{ color:"#fff" }}>{fmt(payload[0].value)}</div>
                     </div>
                   );
-                }} />
-                <Bar dataKey="value" radius={[3, 3, 0, 0]} label={<CustomBarLabel />} isAnimationActive={true}>
-                  {chartData.map((entry, i) => (
-                    <Cell key={i} fill={entry.fill} />
-                  ))}
+                }}/>
+                <Bar dataKey="value" radius={[3,3,0,0]} label={<CustomBarLabel/>} isAnimationActive={true}>
+                  {chartData.map((entry, i) => <Cell key={i} fill={entry.fill}/>)}
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
           </div>
 
-          {/* Contextual message */}
           {msg && (
-            <div style={{ border: `1px solid ${msg.color}33`, borderLeft: `3px solid ${msg.color}`, padding: "18px 24px", background: C.surface, fontSize: 14, color: C.textMuted, lineHeight: 1.7 }}>
+            <div style={{ border:`1px solid ${msg.color}33`, borderLeft:`3px solid ${msg.color}`, padding:"18px 24px", background:C.surface, fontSize:14, color:C.textMuted, lineHeight:1.7 }}>
               {msg.text}
             </div>
           )}
 
-          <DataNote style={{ marginTop: 16 }}>
-            Comparison uses {latest.year} SCF median net worth — Black families: {fmt(latest.black)} · White families: {fmt(latest.white)}
-          </DataNote>
+          <DataNote>{tx.dataNote(latest.year, fmt(latest.black), fmt(latest.white))}</DataNote>
         </>
       )}
     </section>
@@ -608,69 +543,39 @@ function PersonalComparison({ wealthData }) {
 }
 
 function AboutContact() {
+  const ab = C_TEXT.about;
+  const co = C_TEXT.contact;
   return (
     <section style={{ marginBottom: "clamp(60px,8vw,100px)" }}>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 24 }}>
+      <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(300px, 1fr))", gap:24 }}>
 
         {/* About */}
-        <div style={{ border: `1px solid ${C.gold}33`, borderLeft: `3px solid ${C.gold}`, padding: "clamp(24px,4vw,40px)", background: C.surface }}>
-          <div style={{ ...monoStyle, fontSize: 11, color: C.gold, letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: 16 }}>
-            About
-          </div>
-          <div style={{ ...serifStyle, fontSize: 22, fontWeight: 700, color: "#f0ece0", marginBottom: 4 }}>
-            Jabre Thornton
-          </div>
-          <div style={{ ...monoStyle, fontSize: 11, color: C.textDim, marginBottom: 20, letterSpacing: "0.05em" }}>
-            Software Developer · Father
-          </div>
-          <p style={{ fontSize: 14, color: C.textMuted, lineHeight: 1.75 }}>
-            I built this site because the racial wealth and income gap is one of the most significant
-            and persistent injustices in American economic life — and I wanted to put real numbers
-            to it. Data has a way of cutting through the noise.
-          </p>
-          <p style={{ fontSize: 14, color: C.textMuted, lineHeight: 1.75, marginTop: 14 }}>
-            I'm a software developer and stay-at-home dad. This project is personal. The struggle
-            Black Americans have faced economically is not abstract to me, and I hope the data here
-            makes it less abstract for others too.
-          </p>
+        <div style={{ border:`1px solid ${C.gold}33`, borderLeft:`3px solid ${C.gold}`, padding:"clamp(24px,4vw,40px)", background:C.surface }}>
+          <div style={{ ...monoStyle, fontSize:11, color:C.gold, letterSpacing:"0.2em", textTransform:"uppercase", marginBottom:16 }}>{ab.eyebrow}</div>
+          <div style={{ ...serifStyle, fontSize:22, fontWeight:700, color:"#f0ece0", marginBottom:4 }}>{ab.name}</div>
+          <div style={{ ...monoStyle, fontSize:11, color:C.textDim, marginBottom:20, letterSpacing:"0.05em" }}>{ab.tagline}</div>
+          <p style={{ fontSize:14, color:C.textMuted, lineHeight:1.75 }}>{ab.body1}</p>
+          <p style={{ fontSize:14, color:C.textMuted, lineHeight:1.75, marginTop:14 }}>{ab.body2}</p>
         </div>
 
         {/* Contact */}
-        <div style={{ border: `1px solid ${C.blue}33`, borderLeft: `3px solid ${C.blue}`, padding: "clamp(24px,4vw,40px)", background: C.surface }}>
-          <div style={{ ...monoStyle, fontSize: 11, color: C.blue, letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: 16 }}>
-            Contact
-          </div>
-          <div style={{ ...serifStyle, fontSize: 22, fontWeight: 700, color: "#f0ece0", marginBottom: 20 }}>
-            Questions or Feedback?
-          </div>
-          <p style={{ fontSize: 14, color: C.textMuted, lineHeight: 1.75, marginBottom: 28 }}>
-            If you have questions about the data, want to report an error, or just want to
-            reach out — I'd love to hear from you.
-          </p>
+        <div style={{ border:`1px solid ${C.blue}33`, borderLeft:`3px solid ${C.blue}`, padding:"clamp(24px,4vw,40px)", background:C.surface }}>
+          <div style={{ ...monoStyle, fontSize:11, color:C.blue, letterSpacing:"0.2em", textTransform:"uppercase", marginBottom:16 }}>{co.eyebrow}</div>
+          <div style={{ ...serifStyle, fontSize:22, fontWeight:700, color:"#f0ece0", marginBottom:20 }}>{co.title}</div>
+          <p style={{ fontSize:14, color:C.textMuted, lineHeight:1.75, marginBottom:28 }}>{co.body}</p>
           <a
-            href="mailto:jabrelthornton@gmail.com"
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 10,
-              padding: "12px 22px",
-              background: `${C.blue}18`,
-              border: `1px solid ${C.blue}55`,
-              color: C.blue,
-              ...monoStyle,
-              fontSize: 13,
-              textDecoration: "none",
-              letterSpacing: "0.04em",
-              transition: "all 0.2s",
-            }}
-            onMouseEnter={e => { e.currentTarget.style.background = `${C.blue}30`; e.currentTarget.style.borderColor = C.blue; }}
-            onMouseLeave={e => { e.currentTarget.style.background = `${C.blue}18`; e.currentTarget.style.borderColor = `${C.blue}55`; }}
+            href={`mailto:${co.email}`}
+            style={{ display:"inline-flex", alignItems:"center", gap:10, padding:"12px 22px",
+              background:`${C.blue}18`, border:`1px solid ${C.blue}55`, color:C.blue,
+              ...monoStyle, fontSize:13, textDecoration:"none", letterSpacing:"0.04em", transition:"all 0.2s" }}
+            onMouseEnter={e => { e.currentTarget.style.background=`${C.blue}30`; e.currentTarget.style.borderColor=C.blue; }}
+            onMouseLeave={e => { e.currentTarget.style.background=`${C.blue}18`; e.currentTarget.style.borderColor=`${C.blue}55`; }}
           >
             <svg width="15" height="12" viewBox="0 0 15 12" fill="none" xmlns="http://www.w3.org/2000/svg">
               <rect x="0.5" y="0.5" width="14" height="11" rx="1.5" stroke={C.blue}/>
               <path d="M1 1L7.5 7L14 1" stroke={C.blue} strokeLinecap="round"/>
             </svg>
-            jabrelthornton@gmail.com
+            {co.emailLabel}
           </a>
         </div>
 
@@ -679,12 +584,8 @@ function AboutContact() {
   );
 }
 
-
 // ============================================================
 //  LAYER 8 — ROOT APP
-//  Wires the data hook to the page layout.
-//  To add a new dataset: add a fetch fn, add it to useInequalityData,
-//  create a section component, drop it here between the dividers.
 // ============================================================
 
 export default function App() {
@@ -697,8 +598,12 @@ export default function App() {
   const wm2022 = lastWealth.white  && lastWealth.black  ? (lastWealth.white  / lastWealth.black ).toFixed(1) : "—";
   const wm1989 = firstWealth.white && firstWealth.black ? (firstWealth.white / firstWealth.black).toFixed(1) : "—";
 
+  const hero = C_TEXT.hero;
+  const sc   = C_TEXT.statCards;
+  const ft   = C_TEXT.footer;
+
   return (
-    <div style={{ minHeight:"100vh", background: C.bg, color:"#d4cfc4", fontFamily:"'Georgia', serif", display: "flex", flexDirection: "column", alignItems: "center" }}>
+    <div style={{ minHeight:"100vh", background:C.bg, color:"#d4cfc4", fontFamily:"'Georgia', serif" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Mono:wght@300;400;500&display=swap');
         *{box-sizing:border-box;margin:0;padding:0;}
@@ -713,21 +618,34 @@ export default function App() {
       <div style={{ padding:"clamp(40px,8vw,100px) clamp(24px,8vw,100px) clamp(40px,6vw,72px)", borderBottom:`1px solid ${C.grid}`, position:"relative", overflow:"hidden" }}>
         <div style={{ position:"absolute",top:0,left:0,right:0,bottom:0, background:"radial-gradient(ellipse 80% 60% at 70% 50%, #1a1206 0%, transparent 70%)", pointerEvents:"none" }}/>
         <div style={{ position:"relative", maxWidth:900 }}>
-          <div style={{ ...monoStyle, fontSize:11, color: C.gold, letterSpacing:"0.25em", textTransform:"uppercase", marginBottom:20 }}>
-            Data Investigation · U.S. Economic Inequality
+          <div style={{ ...monoStyle, fontSize:11, color:C.gold, letterSpacing:"0.25em", textTransform:"uppercase", marginBottom:20 }}>
+            {hero.eyebrow}
           </div>
           <h1 style={{ ...serifStyle, fontSize:"clamp(36px,7vw,80px)", fontWeight:900, color:"#f5f0e6", lineHeight:1.0, marginBottom:24, letterSpacing:"-0.02em" }}>
-            The Persistent<br /><span style={{ color: C.gold }}>Gap</span>
+            {hero.headline}<br /><span style={{ color:C.gold }}>{hero.headlineAccent}</span>
           </h1>
-          <p style={{ fontSize:"clamp(15px,2vw,19px)", color: C.textMuted, lineHeight:1.65, maxWidth:640, marginBottom:36 }}>
-            Six decades after the Civil Rights Act, Black Americans earn significantly less and hold a fraction
-            of the wealth of white Americans. This is what the data shows.
+          <p style={{ fontSize:"clamp(15px,2vw,19px)", color:C.textMuted, lineHeight:1.65, maxWidth:640, marginBottom:36 }}>
+            {hero.subheading}
           </p>
           {!loading && !error && (
             <div style={{ display:"flex", gap:12, flexWrap:"wrap" }}>
-              <StatCard label="Black-to-white income ratio (2022)" value={`${lastIncome.ratio}¢`}       sub="per $1 earned by white households"/>
-              <StatCard label="Median wealth gap (2022)"           value={`${wm2022}×`}                 sub={`White families hold ${wm2022}× more wealth`}     accent={C.rust}/>
-              <StatCard label="Wealth ratio change since 1989"     value={`${wm1989}× → ${wm2022}×`}   sub="The gap has barely moved in 33 years"              accent={C.blue}/>
+              <StatCard
+                label={sc.incomeRatio.label}
+                value={`${lastIncome.ratio}¢`}
+                sub={sc.incomeRatio.sub}
+              />
+              <StatCard
+                label={sc.wealthGap.cardLabel}
+                value={`${wm2022}×`}
+                sub={sc.wealthGap.label(wm2022)}
+                accent={C.rust}
+              />
+              <StatCard
+                label={sc.wealthChange.label}
+                value={`${wm1989}× → ${wm2022}×`}
+                sub={sc.wealthChange.sub}
+                accent={C.blue}
+              />
             </div>
           )}
         </div>
@@ -736,34 +654,34 @@ export default function App() {
       {/* BODY */}
       <div style={{ padding:"clamp(40px,6vw,80px) clamp(24px,8vw,100px)", maxWidth:1100, margin:"0 auto" }}>
         {loading && (
-          <div style={{ display:"flex", alignItems:"center", justifyContent:"center", minHeight:"60vh", ...monoStyle, fontSize:13, color: C.textMuted }}>
-            Loading data…
+          <div style={{ display:"flex", alignItems:"center", justifyContent:"center", minHeight:"60vh", ...monoStyle, fontSize:13, color:C.textMuted }}>
+            {C_TEXT.loading}
           </div>
         )}
         {error && (
-          <div style={{ display:"flex", alignItems:"center", justifyContent:"center", minHeight:"60vh", ...monoStyle, fontSize:13, color: C.rust }}>
+          <div style={{ display:"flex", alignItems:"center", justifyContent:"center", minHeight:"60vh", ...monoStyle, fontSize:13, color:C.rust }}>
             Error: {error}
           </div>
         )}
         {!loading && !error && (
           <>
-            <IncomeSection         data={incomeData}/>
+            <IncomeSection      data={incomeData}/>
             <Divider/>
-            <WealthBarSection      data={wealthData}/>
+            <WealthBarSection   data={wealthData}/>
             <Divider/>
-            <WealthRatioSection    data={wealthData}/>
+            <WealthRatioSection data={wealthData}/>
             <Divider/>
-            <PersonalComparison    wealthData={wealthData}/>
+            <PersonalComparison wealthData={wealthData}/>
             <WhyItPersists/>
+            <Divider/>
             <AboutContact/>
           </>
         )}
 
-        <footer style={{ borderTop:`1px solid ${C.grid}`, paddingTop:28, ...monoStyle, fontSize:11, color: C.textFaint, lineHeight:1.8 }}>
-          <div style={{ color: C.textDim, marginBottom:4 }}>Data Sources</div>
-          <div>U.S. Census Bureau — Historical Income Tables (Table H-5), 1967–2022, CPI-U-RS adjusted</div>
-          <div>Federal Reserve Board — Survey of Consumer Finances (SCF), 1989–2022, median family net worth</div>
-          <div style={{ marginTop:12, color: C.textGhost }}>Derenoncourt et al. (2022), "Wealth of Two Nations: The U.S. Racial Wealth Gap, 1860–2020"</div>
+        <footer style={{ borderTop:`1px solid ${C.grid}`, paddingTop:28, ...monoStyle, fontSize:11, color:C.textFaint, lineHeight:1.8 }}>
+          <div style={{ color:C.textDim, marginBottom:4 }}>{ft.sourcesLabel}</div>
+          {ft.sources.map((s, i) => <div key={i}>{s}</div>)}
+          <div style={{ marginTop:12, color:C.textGhost }}>{ft.citation}</div>
         </footer>
       </div>
     </div>
