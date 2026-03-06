@@ -3,7 +3,9 @@ import {
   LineChart, Line, BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer, ReferenceLine, Legend, Area, AreaChart
 } from "recharts";
+import { Analytics } from "@vercel/analytics/react";
 import { CONTENT as C_TEXT } from "./content.js";
+
 
 // ============================================================
 //  LAYER 1 — STATIC DATA STORE
@@ -684,6 +686,7 @@ export default function App() {
           <div style={{ marginTop:12, color:C.textGhost }}>{ft.citation}</div>
         </footer>
       </div>
+      <Analytics />
     </div>
   );
 }
